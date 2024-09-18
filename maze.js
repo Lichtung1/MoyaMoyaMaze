@@ -389,7 +389,7 @@ function updateGlitchEffect() {
     glitchOverlay.style.opacity = 1; // Keep opacity constant
 
     // Calculate the desired number of hex strings
-    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 20); // Adjust multiplier for density
+    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 15); // Adjust multiplier for density
 
     // Add new hex strings if needed
     const numToAdd = desiredNumStrings - currentNumHexStrings;
