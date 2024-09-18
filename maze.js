@@ -378,22 +378,37 @@ function updateGlitchEffect() {
 
     glitchOverlay.innerHTML = ASCII_ART;
     glitchOverlay.style.color = `rgba(153, 0, 255, ${asciiOpacity})`; // Adjust color opacity
+    
+    // Adjust font size for mobile screens
+    glitchOverlay.style.fontSize = '6px'; // Reduced from default 12px
+    glitchOverlay.style.lineHeight = '1'; // Ensure tight line spacing
+    
+    // Center the ASCII art
+    glitchOverlay.style.display = 'flex';
+    glitchOverlay.style.justifyContent = 'center';
+    glitchOverlay.style.alignItems = 'center';
+    glitchOverlay.style.height = '100vh';
+    glitchOverlay.style.width = '100vw';
+    
+    // Maintain aspect ratio
+    glitchOverlay.style.whiteSpace = 'pre';
+    
     glitchOverlay.style.textShadow = `
-      0 0 5px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 10px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 20px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 40px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 80px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 90px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 100px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 150px rgba(255, 0, 255, ${asciiOpacity})
+      0 0 2px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 4px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 6px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 8px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 10px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 12px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 14px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 16px rgba(255, 0, 255, ${asciiOpacity})
     `;
-  } else if (intensity >= 0.25) {
+     } else if (intensity >= 0.25) {
     // From insanity level 5 to 15, display random hexadecimal strings
     glitchOverlay.style.opacity = 1; // Keep opacity constant
 
     // Calculate the desired number of hex strings
-    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 50); // Adjust multiplier for density
+    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 25); // Adjust multiplier for density
 
     // Add new hex strings if needed
     const numToAdd = desiredNumStrings - currentNumHexStrings;
