@@ -369,46 +369,27 @@ function updateGlitchEffect() {
   const intensity = insanityLevel / maxInsanityLevel;
 
   if (intensity >= 1) {
-    // From insanity level 15 to 20, display ASCII art with increasing opacity
-    glitchOverlay.style.opacity = 1; // Keep opacity at 1
+    glitchOverlay.style.opacity = '1';
 
-    // Set ASCII art opacity based on insanity level
-    let asciiOpacity = (intensity - 0.75) * 4; // Goes from 0 to 1 as intensity goes from 0.75 to 1.0
+    let asciiOpacity = (intensity - 0.75) * 4;
     if (asciiOpacity > 1) asciiOpacity = 1;
 
     glitchOverlay.innerHTML = ASCII_ART;
-    glitchOverlay.style.color = `rgba(153, 0, 255, ${asciiOpacity})`; // Adjust color opacity
     
-    // Adjust font size for mobile screens
-    glitchOverlay.style.fontSize = '6px'; // Reduced from default 12px
-    glitchOverlay.style.lineHeight = '1'; // Ensure tight line spacing
-    
-    // Center the ASCII art
     glitchOverlay.style.display = 'flex';
     glitchOverlay.style.justifyContent = 'center';
     glitchOverlay.style.alignItems = 'center';
     glitchOverlay.style.height = '100vh';
     glitchOverlay.style.width = '100vw';
     
-    // Maintain aspect ratio
-    glitchOverlay.style.whiteSpace = 'pre';
-    
-    glitchOverlay.style.textShadow = `
-      0 0 2px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 4px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 6px rgba(153, 0, 255, ${asciiOpacity}),
-      0 0 8px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 10px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 12px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 14px rgba(255, 0, 255, ${asciiOpacity}),
-      0 0 16px rgba(255, 0, 255, ${asciiOpacity})
-    `;
-     } else if (intensity >= 0.25) {
+    // Ensure the glow effect is visible
+    glitchOverlay.style.opacity = asciiOpacity.toString();
+  } else if (intensity >= 0.25) {
     // From insanity level 5 to 15, display random hexadecimal strings
     glitchOverlay.style.opacity = 1; // Keep opacity constant
 
     // Calculate the desired number of hex strings
-    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 25); // Adjust multiplier for density
+    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 20); // Adjust multiplier for density
 
     // Add new hex strings if needed
     const numToAdd = desiredNumStrings - currentNumHexStrings;
@@ -464,7 +445,6 @@ function updateGlitchEffect() {
   }
 }
 
-// Function to trigger game over
 function triggerGameOver() {
   // Fade out the maze
   renderer.domElement.style.transition = 'opacity 1s ease-in-out';
@@ -483,14 +463,23 @@ function triggerGameOver() {
     gameOverScreen.classList.add('show');
 
     // Display ASCII art in game over screen
-    asciiArtElement.textContent = ASCII_ART;
-    asciiArtElement.style.opacity = '1'; // Fade in ASCII art
+    asciiArtElement.innerHTML = ASCII_ART;
+    
+    // Apply minimal styling
+    asciiArtElement.style.display = 'flex';
+    asciiArtElement.style.justifyContent = 'center';
+    asciiArtElement.style.alignItems = 'center';
+    asciiArtElement.style.height = '100vh';
+    asciiArtElement.style.width = '100vw';
 
-    // Show "Try Again?" link after delay
+    // Ensure the glow effect is visible
+    asciiArtElement.style.opacity = '1';
+
+    // Show "Try Again?" link after a delay
     setTimeout(() => {
-      tryAgainLink.style.opacity = '1'; // Fade in the link
-    }, showTryAgainDelay); // Adjust as needed
-  }, 1000); // Adjust based on fade-out duration
+      tryAgainLink.style.opacity = '1';
+    }, 3000);
+  }, 1000);
 }
 
 // Function to reset the game
