@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Infinite Maze - Your Band Name</title>
   <style>
-    body { margin: 0; overflow: hidden; }
+    body { margin: 0; overflow: hidden; transition: background-color 1s ease-in-out; }
     canvas { display: block; }
 
     /* Insanity Meter Styles */
@@ -13,37 +13,42 @@
       top: 10px;
       right: 10px;
       width: 30px;
-      height: 200px; /* Adjust height as needed */
+      height: 200px;
       background-color: black;
       border: 2px solid white;
-      z-index: 1; /* Ensure it's above the canvas */
+      z-index: 1;
     }
 
     #insanity-fill {
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: 0%; /* Will be updated dynamically */
-      background-color: #9900ff; /* Purple (#90f) */
+      height: 0%;
+      background-color: #9900ff;
     }
 
     /* Glitch Overlay Styles */
     #glitch-overlay {
-      position: fixed; /* Cover the entire viewport */
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      opacity: 0; /* Start invisible */
+      opacity: 0;
       z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
       color: #9900ff;
-      white-space: pre; /* Preserve spaces and line breaks */
-      text-align: center; /* Center-align text */
+      text-align: center;
+      white-space: pre-wrap;
+      font-family: 'Courier New', monospace;
+      transition: opacity 1s ease-in-out;
     }
 
-    #glitch-overlay .hex-char {
+    #glitch-overlay .hex-string {
       position: absolute;
       font-family: 'Courier New', monospace;
       text-shadow:
@@ -59,38 +64,64 @@
 
     /* Game Over Screen Styles */
     #game-over-screen {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: black;
-      display: flex;
+      width: 100vw;
+      height: 100vh;
+      background-color: white; /* Change as needed */
+      display: none; /* Hide by default */
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 3; /* Above all other elements */
-      transition: opacity 1s ease-in-out;
+      opacity: 1;
+      pointer-events: none; /* Will be set to 'all' when 'show' class is added */
+      z-index: 3;
     }
 
     #game-over-screen.show {
-      opacity: 1;
+      display: flex;
       pointer-events: all;
     }
 
-    #band-logo {
-      max-width: 80%;
-      height: auto;
-      margin-bottom: 20px;
+    #ascii-art {
+      color: #9900ff;
+      text-shadow:
+        0 0 5px #9900ff,
+        0 0 10px #9900ff,
+        0 0 20px #9900ff,
+        0 0 40px #ff00ff,
+        0 0 80px #ff00ff,
+        0 0 90px #ff00ff,
+        0 0 100px #ff00ff,
+        0 0 150px #ff00ff;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      text-align: center;
+      font-size: 12px;
+      opacity: 0; /* Start invisible */
+      transition: opacity 1s ease-in-out;
     }
 
     #try-again-link {
       font-size: 24px;
-      color: white;
+      color: #9900ff;
       text-decoration: underline;
       cursor: pointer;
+      margin-top: 20px;
+      opacity: 0; /* Start invisible */
+      transition: opacity 1s ease-in-out;
+    }
+
+    /* Responsive adjustments */
+    @media only screen and (max-width: 600px) {
+      #ascii-art {
+        font-size: 10px;
+      }
+
+      #try-again-link {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -105,7 +136,7 @@
 
   <!-- Game Over Screen -->
   <div id="game-over-screen">
-    <img src="band-logo.png" alt="Band Logo" id="band-logo">
+    <pre id="ascii-art"></pre> <!-- We will use this pre tag to display the ASCII art -->
     <a href="#" id="try-again-link">Try Again?</a>
   </div>
 
