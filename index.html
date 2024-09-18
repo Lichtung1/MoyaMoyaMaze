@@ -86,34 +86,38 @@
       pointer-events: all;
     }
   
-    #ascii-art {
+    #ascii-art, #glitch-overlay {
       color: #9900ff;
       text-shadow:
-        0 0 5px #9900ff,
-        0 0 10px #9900ff,
-        0 0 20px #9900ff,
-        0 0 40px #ff00ff,
-        0 0 80px #ff00ff,
-        0 0 90px #ff00ff,
-        0 0 100px #ff00ff,
-        0 0 150px #ff00ff;
+        0 0 3px #9900ff,
+        0 0 6px #9900ff,
+        0 0 9px #9900ff,
+        0 0 12px #ff00ff,
+        0 0 15px #ff00ff,
+        0 0 18px #ff00ff;
       font-family: Consolas, 'Courier New', monospace;
       white-space: pre;
       text-align: center;
-      font-size: 5px;
+      font-size: 6px;
       line-height: 1;
-      opacity: 0;
+      opacity: 1;
       transition: opacity 1s ease-in-out;
     }
   
     #try-again-link {
-      font-size: 24px;
-      color: #9900ff;
-      text-decoration: underline;
-      cursor: pointer;
-      margin-top: 20px;
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
+    position: absolute;
+    bottom: 20px;
+    font-size: 24px;
+    color: #9900ff;
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none; /* Disable interactions when invisible */
+    }
+
+    #try-again-link[style*="opacity: 1"] {
+      pointer-events: auto; /* Enable interactions when visible */
     }
   
     /* Responsive adjustments */
