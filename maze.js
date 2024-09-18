@@ -31,11 +31,18 @@ const maxInsanityLevel = 20; // Set to 20
 // Elements for effects
 let glitchOverlay;
 let gameOverScreen;
+let asciiArtElement;
+let tryAgainLink;
 
-// Variable to track the current number of hex characters
-let currentNumHexChars = 0;
+// Variable to track the current number of hex strings
+let currentNumHexStrings = 0;
 
-// Function to initialize the scene
+// Game over variables
+let gameOverTriggered = false; // To prevent multiple triggers
+const postMaxInsanityDuration = 3000; // Duration after max insanity before fading out (in milliseconds)
+const showTryAgainDelay = 3000; // Delay before showing "Try Again?" link (in milliseconds)
+let backgroundColor = 'white'; // Background color when fading out ('black' or 'white')
+
 function init() {
   // Create the scene
   scene = new THREE.Scene();
@@ -93,11 +100,15 @@ function init() {
   // Initialize the glitch overlay
   glitchOverlay = document.getElementById('glitch-overlay');
 
-  // Initialize the game over screen
+  // Initialize the game over screen and ASCII art element
   gameOverScreen = document.getElementById('game-over-screen');
+  asciiArtElement = document.getElementById('ascii-art');
+  tryAgainLink = document.getElementById('try-again-link');
+
+  // Hide the "Try Again?" link initially
+  tryAgainLink.style.opacity = '0';
 
   // Add event listener for "Try Again?" link
-  const tryAgainLink = document.getElementById('try-again-link');
   tryAgainLink.addEventListener('click', resetGame);
 
   // Start the animation loop
@@ -308,14 +319,18 @@ function increaseInsanity() {
     updateInsanityMeterDisplay();
   }
 
-  if (insanityLevel >= maxInsanityLevel) {
-    triggerGameOver();
+  if (insanityLevel >= maxInsanityLevel && !gameOverTriggered) {
+    gameOverTriggered = true;
+    // Continue movement for specified duration before triggering game over
+    setTimeout(() => {
+      triggerGameOver();
+    }, postMaxInsanityDuration);
   }
 }
 
 // Function to decay insanity level over time
 function decayInsanity() {
-  if (insanityLevel > 0) {
+  if (insanityLevel > 0 && insanityLevel < maxInsanityLevel) {
     insanityLevel -= 0.001; // Adjust decay rate as needed
     if (insanityLevel < 0) insanityLevel = 0;
     updateInsanityMeterDisplay();
@@ -353,37 +368,32 @@ function applyInsanityEffects() {
 function updateGlitchEffect() {
   const intensity = insanityLevel / maxInsanityLevel;
 
-  if (intensity >= 1.0) {
-    // At maximum insanity, display the ASCII art
-    glitchOverlay.innerHTML = '';
-    glitchOverlay.style.opacity = 1;
+  if (intensity >= 1) {
+    // From insanity level 15 to 20, display ASCII art with increasing opacity
+    glitchOverlay.style.opacity = 1; // Keep opacity at 1
 
-    // Set styles for ASCII art
-    glitchOverlay.style.color = '#9900ff';
-    glitchOverlay.style.textAlign = 'center';
-    glitchOverlay.style.whiteSpace = 'pre';
-    glitchOverlay.style.fontSize = '12px';
-    glitchOverlay.style.fontFamily = "Consolas, 'Courier New', monospace";
-
-    // Set text-shadow for glow effect
-    glitchOverlay.style.textShadow = `
-      0 0 5px #9900ff,
-      0 0 10px #9900ff,
-      0 0 20px #9900ff,
-      0 0 40px #ff00ff,
-      0 0 80px #ff00ff,
-      0 0 90px #ff00ff,
-      0 0 100px #ff00ff,
-      0 0 150px #ff00ff
-    `;
+    // Set ASCII art opacity based on insanity level
+    let asciiOpacity = (intensity - 0.75) * 4; // Goes from 0 to 1 as intensity goes from 0.75 to 1.0
+    if (asciiOpacity > 1) asciiOpacity = 1;
 
     glitchOverlay.innerHTML = ASCII_ART;
+    glitchOverlay.style.color = `rgba(153, 0, 255, ${asciiOpacity})`; // Adjust color opacity
+    glitchOverlay.style.textShadow = `
+      0 0 5px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 10px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 20px rgba(153, 0, 255, ${asciiOpacity}),
+      0 0 40px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 80px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 90px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 100px rgba(255, 0, 255, ${asciiOpacity}),
+      0 0 150px rgba(255, 0, 255, ${asciiOpacity})
+    `;
   } else if (intensity >= 0.25) {
-    // From insanity level 5 to 20, display random hexadecimal strings
+    // From insanity level 5 to 15, display random hexadecimal strings
     glitchOverlay.style.opacity = 1; // Keep opacity constant
 
     // Calculate the desired number of hex strings
-    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 3) * 50); // Adjust multiplier for density
+    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 0.5) * 50); // Adjust multiplier for density
 
     // Add new hex strings if needed
     const numToAdd = desiredNumStrings - currentNumHexStrings;
@@ -411,7 +421,7 @@ function updateGlitchEffect() {
         const randomFontSize = 10 + Math.random() * 20; // Between 10px and 30px
         hexString.style.fontSize = randomFontSize + 'px';
 
-        // Set font family to Consolas
+        // Set font family
         hexString.style.fontFamily = "Consolas, 'Courier New', monospace";
 
         // Set text-shadow for glow effect
@@ -441,25 +451,31 @@ function updateGlitchEffect() {
 
 // Function to trigger game over
 function triggerGameOver() {
-  // Pause camera movement
-  isMoving = false;
-  isRotating = false;
+  // Fade out the maze
+  renderer.domElement.style.transition = 'opacity 1s ease-in-out';
+  renderer.domElement.style.opacity = '0';
 
-  // Show glitch overlay with ASCII art
-  glitchOverlay.style.opacity = 1;
-  glitchOverlay.innerHTML = ASCII_ART;
+  // Fade background to specified color
+  document.body.style.transition = 'background-color 1s ease-in-out';
+  document.body.style.backgroundColor = backgroundColor;
 
-  // Wait for a few seconds before fading to black
+  // After fade-out duration, proceed
   setTimeout(() => {
-    // Fade out the maze
-    renderer.domElement.style.transition = 'opacity 1s ease-in-out';
-    renderer.domElement.style.opacity = '0';
+    // Hide glitch overlay
+    glitchOverlay.style.opacity = '0';
 
-    // Show game over screen after fade-out
+    // Show game over screen
+    gameOverScreen.classList.add('show');
+
+    // Display ASCII art in game over screen
+    asciiArtElement.textContent = ASCII_ART;
+    asciiArtElement.style.opacity = '1'; // Fade in ASCII art
+
+    // Show "Try Again?" link after delay
     setTimeout(() => {
-      gameOverScreen.classList.add('show');
-    }, 5000); // Adjusted to desired time (e.g., 5000 ms)
-  }, 5000); // Display ASCII art for desired time (e.g., 5000 ms)
+      tryAgainLink.style.opacity = '1'; // Fade in the link
+    }, showTryAgainDelay); // Adjust as needed
+  }, 1000); // Adjust based on fade-out duration
 }
 
 // Function to reset the game
@@ -469,17 +485,26 @@ function resetGame(event) {
   // Reset insanity level
   insanityLevel = 0;
   updateInsanityMeterDisplay();
+  gameOverTriggered = false;
 
   // Hide glitch overlay
   glitchOverlay.style.opacity = 0;
   glitchOverlay.innerHTML = '';
-  currentNumHexChars = 0;
+  currentNumHexStrings = 0;
 
-  // Hide game over screen
+  // Hide game over screen and clear ASCII art
   gameOverScreen.classList.remove('show');
+  asciiArtElement.textContent = '';
+  asciiArtElement.style.opacity = '0';
+
+  // Reset "Try Again?" link
+  tryAgainLink.style.opacity = '0';
 
   // Fade in the maze
   renderer.domElement.style.opacity = '1';
+
+  // Reset background color
+  document.body.style.backgroundColor = '';
 
   // Reinitialize variables
   isMoving = false;
@@ -499,7 +524,7 @@ function resetGame(event) {
 
   // Reset walls
   mazeWalls.forEach(wall => {
-    wall.isCameraNear = false; // Reset isCameraNear
+    wall.isCameraNear = false;
   });
 
   // Start moving again
@@ -521,14 +546,18 @@ function animate() {
 
   renderer.render(scene, camera);
 
-  // Start moving the camera if it's not already moving or rotating
-  if (!isMoving && !isRotating) {
-    moveCamera();
+  // Continue moving the camera if it's not game over
+  if (!gameOverTriggered) {
+    if (!isMoving && !isRotating) {
+      moveCamera();
+    }
   }
 
   // Decay insanity over time
   decayInsanity();
 }
+
+// Rest of the code remains unchanged (moveCamera, moveForward, updateCameraPositionMultipleCells, etc.)
 
 // Function to move the camera
 function moveCamera() {
@@ -775,8 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateInsanityMeterDisplay();
 });
 
-
-// Define your ASCII art here
+// Define ASCII art here
 const ASCII_ART = `
 
                                                                                               @                                                             
@@ -832,6 +860,6 @@ const ASCII_ART = `
                                       @@@  @                                                                    @  @                                        
                                         @@@:@                                                                   @-@                                         
                                           @@@@                                                                 @@@                                          
-                                                                  @@                                                                 @@                                                                 
+                                            @@                                                                @@                                                                 
 
 `; 
