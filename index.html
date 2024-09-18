@@ -86,6 +86,7 @@
       pointer-events: all;
     }
   
+
     #ascii-art, #glitch-overlay {
       color: #9900ff;
       text-shadow:
@@ -102,8 +103,8 @@
       opacity: 1;
       transition: opacity 1s ease-in-out;
       
-      /* Adjusted responsive font size */
-      font-size: 1vmin;
+      /* Base font size */
+      font-size: 8px;
       
       /* Center the content */
       display: flex;
@@ -111,6 +112,20 @@
       align-items: center;
       height: 100vh;
       width: 100vw;
+    }
+
+    /* Adjustments for smaller screens */
+    @media screen and (max-width: 768px) {
+      #ascii-art, #glitch-overlay {
+        font-size: 2.5vw; /* Responsive font size for smaller screens */
+      }
+    }
+
+    /* Further adjustments for very small screens */
+    @media screen and (max-width: 480px) {
+      #ascii-art, #glitch-overlay {
+        font-size: 3vw; /* Slightly larger for very small screens */
+      }
     }
   
     #try-again-link {
