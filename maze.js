@@ -26,11 +26,14 @@ let cameraPath = []; // Keep track of the path
 
 // Variables for insanity level
 let insanityLevel = 0;
-const maxInsanityLevel = 10; // Lowered to 10
+const maxInsanityLevel = 20; // Set to 20
 
 // Elements for effects
 let glitchOverlay;
 let gameOverScreen;
+
+// Variable to track the current number of hex characters
+let currentNumHexChars = 0;
 
 // Function to initialize the scene
 function init() {
@@ -208,7 +211,7 @@ function createMaze() {
           // Determine if the wall should have a photo
           let usePhoto = false;
           let wallMaterialToUse = wallMaterial;
-          if (Math.random() < 0.15) { // 10% chance
+          if (Math.random() < 0.20) { // 20% chance
             usePhoto = true;
             const texture = photoTextures[Math.floor(Math.random() * photoTextures.length)];
             wallMaterialToUse = new THREE.MeshStandardMaterial({ map: texture });
@@ -346,19 +349,93 @@ function applyInsanityEffects() {
   }
 }
 
-// Function to update the glitch effect with ASCII art
+// Function to update the glitch effect
 function updateGlitchEffect() {
   const intensity = insanityLevel / maxInsanityLevel;
 
-  // Show glitch overlay if insanity is at maximum
   if (intensity >= 1.0) {
+    // At maximum insanity, display the ASCII art
+    glitchOverlay.innerHTML = '';
     glitchOverlay.style.opacity = 1;
 
-    // Display your ASCII art
-    glitchOverlay.textContent = ASCII_ART;
+    // Set styles for ASCII art
+    glitchOverlay.style.color = '#9900ff';
+    glitchOverlay.style.textAlign = 'center';
+    glitchOverlay.style.whiteSpace = 'pre';
+    glitchOverlay.style.fontSize = '12px';
+    glitchOverlay.style.fontFamily = "Consolas, 'Courier New', monospace";
+
+    // Set text-shadow for glow effect
+    glitchOverlay.style.textShadow = `
+      0 0 5px #9900ff,
+      0 0 10px #9900ff,
+      0 0 20px #9900ff,
+      0 0 40px #ff00ff,
+      0 0 80px #ff00ff,
+      0 0 90px #ff00ff,
+      0 0 100px #ff00ff,
+      0 0 150px #ff00ff
+    `;
+
+    glitchOverlay.innerHTML = ASCII_ART;
+  } else if (intensity >= 0.25) {
+    // From insanity level 5 to 20, display random hexadecimal strings
+    glitchOverlay.style.opacity = 1; // Keep opacity constant
+
+    // Calculate the desired number of hex strings
+    const desiredNumStrings = Math.floor((intensity - 0.25) * (4 / 3) * 50); // Adjust multiplier for density
+
+    // Add new hex strings if needed
+    const numToAdd = desiredNumStrings - currentNumHexStrings;
+    if (numToAdd > 0) {
+      for (let i = 0; i < numToAdd; i++) {
+        const hexString = document.createElement('span');
+        hexString.classList.add('hex-string');
+
+        // Generate a random hexadecimal string (4 to 8 characters long)
+        const length = 4 + Math.floor(Math.random() * 5);
+        let hexContent = '';
+        for (let j = 0; j < length; j++) {
+          hexContent += Math.floor(Math.random() * 16).toString(16).toUpperCase();
+        }
+        hexString.textContent = hexContent;
+
+        // Random position within the viewport
+        const randomX = Math.random() * 100; // Percentage
+        const randomY = Math.random() * 100; // Percentage
+        hexString.style.position = 'absolute';
+        hexString.style.left = randomX + 'vw';
+        hexString.style.top = randomY + 'vh';
+
+        // Random font size
+        const randomFontSize = 10 + Math.random() * 20; // Between 10px and 30px
+        hexString.style.fontSize = randomFontSize + 'px';
+
+        // Set font family to Consolas
+        hexString.style.fontFamily = "Consolas, 'Courier New', monospace";
+
+        // Set text-shadow for glow effect
+        hexString.style.textShadow = `
+          0 0 5px #9900ff,
+          0 0 10px #9900ff,
+          0 0 20px #9900ff,
+          0 0 40px #ff00ff,
+          0 0 80px #ff00ff,
+          0 0 90px #ff00ff,
+          0 0 100px #ff00ff,
+          0 0 150px #ff00ff
+        `;
+        hexString.style.color = '#9900ff'; // Ensure color is set
+
+        glitchOverlay.appendChild(hexString);
+      }
+      currentNumHexStrings = desiredNumStrings;
+    }
   } else {
+    // Below insanity level 5, no glitch effect
     glitchOverlay.style.opacity = 0;
-    glitchOverlay.textContent = '';
+    glitchOverlay.innerHTML = '';
+    currentNumHexStrings = 0;
   }
 }
 
@@ -370,7 +447,7 @@ function triggerGameOver() {
 
   // Show glitch overlay with ASCII art
   glitchOverlay.style.opacity = 1;
-  glitchOverlay.textContent = ASCII_ART;
+  glitchOverlay.innerHTML = ASCII_ART;
 
   // Wait for a few seconds before fading to black
   setTimeout(() => {
@@ -381,8 +458,8 @@ function triggerGameOver() {
     // Show game over screen after fade-out
     setTimeout(() => {
       gameOverScreen.classList.add('show');
-    }, 10000);
-  }, 10000); // Display ASCII art for 3 seconds
+    }, 5000); // Adjusted to desired time (e.g., 5000 ms)
+  }, 5000); // Display ASCII art for desired time (e.g., 5000 ms)
 }
 
 // Function to reset the game
@@ -395,7 +472,8 @@ function resetGame(event) {
 
   // Hide glitch overlay
   glitchOverlay.style.opacity = 0;
-  glitchOverlay.textContent = '';
+  glitchOverlay.innerHTML = '';
+  currentNumHexChars = 0;
 
   // Hide game over screen
   gameOverScreen.classList.remove('show');
@@ -697,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateInsanityMeterDisplay();
 });
 
+
 // Define your ASCII art here
 const ASCII_ART = `
 
@@ -753,6 +832,6 @@ const ASCII_ART = `
                                       @@@  @                                                                    @  @                                        
                                         @@@:@                                                                   @-@                                         
                                           @@@@                                                                 @@@                                          
-                                             @@                                                              @@                                                                 
+                                                                  @@                                                                 @@                                                                 
 
 `; 
